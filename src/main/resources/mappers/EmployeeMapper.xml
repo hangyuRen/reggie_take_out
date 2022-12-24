@@ -1,0 +1,37 @@
+ <!DOCTYPE mapper PUBLIC "-//mybatis.org.DTO Mapper 3,0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.itheima.mapper.EmployeeMapper">
+
+    <!--<resultMap id="employeeResultMap" type="com.itheima.domain.Employee">
+        <result property="idNumber" column="id_number"></result>
+    </resultMap> -->
+
+
+    <select id="selectByPage" resultType="Employee">
+        select *
+        from employee
+        <where>
+            <if test="name != null and name != ''">
+                name like #{name}
+            </if>
+        </where>
+        limit #{page},#{pageSize}
+    </select>
+
+    <select id="getById" resultType="Employee">
+        select *
+        from employee
+        where id = #{id}
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Integer">
+        select count(1)
+        from employee
+        <where>
+            <if test="name != null and name != ''">
+                name like #{name}
+            </if>
+        </where>
+    </select>
+
+
+</mapper>

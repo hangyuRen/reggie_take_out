@@ -1,0 +1,16 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org.DTO Mapper 3,0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.itheima.mapper.CategoryMapper">
+
+    <select id="selectByPage" resultType="Category">
+        select *
+        from category
+        order by sort
+        limit #{page},#{pageSize}
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Integer">
+        select count(1)
+        from category
+    </select>
+</mapper>

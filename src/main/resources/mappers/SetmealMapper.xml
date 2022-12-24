@@ -1,0 +1,50 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org.DTO Mapper 3,0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.SetmealMapper">
+
+    <update id="modifyStatusForSingleOrBatch">
+        update
+        setmeal
+        set status = #{status}
+        where id in
+        <foreach collection="ids" item="idItem" separator="," open="(" close=")">
+            #{idItem}
+        </foreach>
+    </update>
+
+    <delete id="deleteSingleOrBatchById">
+        delete
+        from setmeal
+        where id in
+        <foreach collection="ids" item="idItem" separator="," open="(" close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+
+    <select id="selectByPage" resultType="com.itheima.domain.Setmeal">
+        select *
+        from setmeal
+        <where>
+            <if test="name != null and name != ''">
+                name like #{name}
+            </if>
+        </where>
+        limit #{page},#{pageSize}
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Integer">
+        select count(1)
+        from setmeal
+        <where>
+            <if test="name != null and name != ''">
+                name like #{name}
+            </if>
+        </where>
+    </select>
+
+    <select id="getStatusById" resultType="java.lang.Integer">
+        select status
+        from setmeal
+        where id = #{id}
+    </select>
+
+</mapper>

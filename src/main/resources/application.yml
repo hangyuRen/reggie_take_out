@@ -1,0 +1,37 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: "123456"
+    type: com.alibaba.druid.pool.DruidDataSource
+  mail:
+    username: hyuren@qq.com
+    password: djazeecmjihcdgja
+    host: smtp.qq.com
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: assign_id
+      logic-delete-field: isDeleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+  mapper-locations: classpath:/mappers/*.xml
+  type-aliases-package: com.itheima.domain
+
+reggie:
+  path: D:\image\
+
+loginMail:
+  from: hyuren@qq.com
+  to: hyuren@qq.com
+  subject: "瑞吉外卖"
+  text: "[瑞吉外卖]您的登录验证码是:"

@@ -1,0 +1,17 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org.DTO Mapper 3,0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.DishFlavorMapper">
+    <delete id="deleteBatches">
+        delete
+        from dish_flavor
+        where dish_id in
+        <foreach collection="ids" item="idItem" separator="," open="(" close=")">
+            #{idItem}
+        </foreach>
+    </delete>
+
+    <select id="getFlavorsById" resultType="com.itheima.domain.DishFlavor">
+        select *
+        from dish_flavor
+        where dish_id = #{id}
+    </select>
+</mapper>
