@@ -11,11 +11,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("all")
 @Service
@@ -31,6 +33,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private String mailSubject;
     @Value("${loginMail.text}")
     private String text;
+    @Autowired
+    private RedisTemplate redisTemplate;
     @Override
     public Result<String> sendMessage(User user, HttpSession httpSession) {
         String phone = user.getPhone();
@@ -47,7 +51,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             simpleMailMessage.setText(text + code);
             javaMailSender.send(simpleMailMessage);
 
-            httpSession.setAttribute(phone,code);
+            redisTemplate.opsForValue().set(phone,code,1, TimeUnit.MINUTES);
 
             return Result.success("发送成功");
         }
@@ -60,7 +64,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String phone = (String) map.get("phone");
         String code = (String) map.get("code");
 
-        Object codeInSession = httpSession.getAttribute(phone);
+        Object codeInSession = redisTemplate.opsForValue().get(phone);
         if(codeInSession != null && codeInSession.equals(code)) {
             LambdaQueryWrapper<User> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(User::getPhone,phone);
@@ -72,6 +76,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
                 this.save(user);
             }
             httpSession.setAttribute("user",user.getId());
+            redisTemplate.delete(phone);
             return Result.success(user);
         }
         return Result.error("短信发送失败");

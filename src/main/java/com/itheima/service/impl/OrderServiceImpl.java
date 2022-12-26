@@ -67,20 +67,20 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     }
 
     public String concatAddress(String provinceName, String cityName, String districtName, String detail) {
-        String address = "";
+        StringBuilder stringBuilder=new StringBuilder();
         if(provinceName != null) {
-            address += provinceName;
+            stringBuilder.append(provinceName);
         }
         if(cityName != null) {
-            address += cityName;
+            stringBuilder.append(cityName);
         }
         if(districtName != null) {
-            address += districtName;
+            stringBuilder.append(districtName);
         }
         if(detail != null) {
-            address += detail;
+            stringBuilder.append(detail);
         }
-        return address;
+        return stringBuilder.toString();
     }
 
     @Override
