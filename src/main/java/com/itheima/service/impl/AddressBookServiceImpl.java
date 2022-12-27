@@ -10,6 +10,10 @@ import com.itheima.mapper.AddressBookMapper;
 import com.itheima.service.AddressBookService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +39,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     }
 
     @Override
+    @CachePut(value = "addressCache",key = "#addressBook.id",condition = "#addressbook != null")
     public Result<String> addAddress(AddressBook addressBook) {
         log.info("address:{}",addressBook.toString());
         addressBook.setUserId(BaseContext.getCurrentId());
@@ -48,6 +53,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "addressCache",key = "#id")
     public Result<String> modifyDefaultAddress(Long id) {
         int chancelDefaultAddress = addressBookMapper.chancelDefaultAddress(BaseContext.getCurrentId());
         if(chancelDefaultAddress <= 0) {
@@ -61,6 +67,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     }
 
     @Override
+    @Cacheable(value = "addressCache",key = "#id",condition = "#id != null")
     public Result<AddressBook> getAddressById(Long id) {
         AddressBook addressBook = addressBookMapper.selectById(id);
         if(addressBook == null) {
@@ -70,6 +77,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     }
 
     @Override
+    @CacheEvict(value = "addressCache",key = "#addressBook.id",condition = "#addressBook != null")
     public Result<String> updateAddress(AddressBook addressBook) {
         int i = addressBookMapper.updateById(addressBook);
         if(i <= 0) {
@@ -79,6 +87,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     }
 
     @Override
+    @CacheEvict(value = "addressCache",key = "#ids",condition = "#ids != null")
     public Result<String> deleteAddress(Long ids) {
         int i = addressBookMapper.deleteById(ids);
         if(i <= 0) {

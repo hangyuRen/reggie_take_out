@@ -1,12 +1,14 @@
 package com.itheima.common;
 
 import lombok.Data;
+
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
-public class Result<T> {
-
+public class Result<T> implements Serializable {
+    private static final Long serialVersionUID = 1L;
     private Integer code;
 
     private String msg;
