@@ -3,6 +3,7 @@ package com.itheima.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.Result;
 import com.itheima.domain.Category;
 import com.itheima.domain.Dish;
@@ -14,6 +15,9 @@ import com.itheima.mapper.SetmealMapper;
 import com.itheima.service.CategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
@@ -28,6 +32,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     private SetmealMapper setmealMapper;
 
     @Override
+    @MyLog
     public Result<String> add(Category category) {
         log.info("category{}",category.toString());
         int insert = categoryMapper.insert(category);
@@ -40,6 +45,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    @Cacheable(value = "categoryCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)",unless = "#result = null")
     public Result<Page<Category>> selectByPage(int page, int pageSize) {
         log.info("page = {},pageSize = {}",page,pageSize);
         Page<Category> iPage = new Page<>();
@@ -50,6 +56,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    @CacheEvict(value = "categoryCache",key = "#id",condition = "#id != null")
     public Result<String> deleteById(Long id) {
         log.info("delete id = {}",id);
 
@@ -75,6 +82,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    @CacheEvict(value = "categoryCache",key = "#category.id",condition = "category != null")
     public Result<String> updateCategory(Category category) {
         log.info("category:{}",category.toString());
 
@@ -88,6 +96,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     }
 
     @Override
+    @Cacheable(value = "categoryCache",key = "#category.type",condition = "#category.type != null")
     public Result<List<Category>> myList(Category category) {
         LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(category.getType() != null,Category::getType,category.getType());

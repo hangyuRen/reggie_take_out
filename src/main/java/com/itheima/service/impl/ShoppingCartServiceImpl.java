@@ -2,6 +2,7 @@ package com.itheima.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.BaseContext;
 import com.itheima.common.Result;
 import com.itheima.domain.ShoppingCart;
@@ -33,6 +34,7 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
     }
 
     @Override
+    @MyLog
     public Result<ShoppingCart> add(ShoppingCart shoppingCart) {
         Long currentId = BaseContext.getCurrentId();
         shoppingCart.setUserId(currentId);

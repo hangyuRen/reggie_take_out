@@ -3,6 +3,7 @@ package com.itheima.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.Result;
 import com.itheima.domain.Employee;
 import com.itheima.mapper.EmployeeMapper;
@@ -10,6 +11,8 @@ import com.itheima.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
 import javax.servlet.http.HttpServletRequest;
@@ -53,6 +56,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
+    @MyLog
     public Result<String> add(HttpServletRequest request, Employee employee) {
 
         //密码MD5加密 默认密码为123456
@@ -76,6 +80,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
+    @Cacheable(value = "employeeCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<Employee>> mybatisPlusSelectByPage(int page, int pageSize, String name) {
 
         log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
@@ -89,6 +94,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
+    @Cacheable(value = "employeeCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<Employee>> selectByPage(int page, int pageSize, String name) {
 
         log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
@@ -104,6 +110,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
+    @CacheEvict(value = "emloyeeCache",key = "#employee.id",condition = "#employee != null")
     public Result<String> update(HttpServletRequest request, Employee employee) {
         /*employee.setUpdateTime(LocalDateTime.now());
         employee.setUpdateUser((Long) request.getSession().getAttribute("employee"));*/
@@ -112,6 +119,7 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     }
 
     @Override
+    @Cacheable(value = "employeeCache",key = "#id",condition = "#id != null")
     public Result<Employee> selectById(Long id) {
         Employee employee = employeeMapper.getById(id);
         return Result.success(employee);

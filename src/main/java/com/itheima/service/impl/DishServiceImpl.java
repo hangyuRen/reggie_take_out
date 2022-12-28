@@ -3,6 +3,8 @@ package com.itheima.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.CacheEvictBatch;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.Result;
 import com.itheima.domain.Category;
 import com.itheima.domain.Dish;
@@ -16,6 +18,8 @@ import com.itheima.service.DishService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -34,6 +38,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @MyLog
     public Result<String> saveWithFlavor(DishDto dishDto) {
         log.info(dishDto.toString());
         int insert = dishMapper.insert(dishDto);
@@ -56,6 +61,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @MyLog
+    @Cacheable(value = "dishCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<Dish>> selectByPage(int page, int pageSize,String name) {
         Page<Dish> iPage = new Page<>();
         if(name != null) {
@@ -69,6 +76,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @MyLog
+    @Cacheable(value = "dishCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<DishDto>> select(int page, int pageSize, String name) {
         Page<DishDto> dishDtoPage = new Page<>();
         if(name != null) {
@@ -93,6 +102,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @Cacheable(value = "dishCache",key = "#id",condition = "#id != null")
     public Result<DishDto> getByIdWithFlavor(Long id) {
         DishDto dishDto = new DishDto();
         Dish dish = dishMapper.getById(id);
@@ -104,6 +114,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "dishCache",key = "#dishDto.id",condition = "#dishDto.id != null")
+    @MyLog
     public Result<String> updateWithFlavor(DishDto dishDto) {
         //更新dish表
         dishMapper.updateById(dishDto);
@@ -123,6 +135,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @CacheEvict(value = "dishCache",key = "#ids",condition = "#ids != null")
     public Result<String> changeStatus(int status, Long ids) {
         int i = dishMapper.changeStatus(status, ids);
         if(i > 0) {
@@ -132,6 +145,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @CacheEvictBatch(value = "dishCache",keys = "#ids")
+    @MyLog
     public Result<String> changeStatusForBatch(int status, List<Long> ids) {
         int i = dishMapper.changeStatusForBatch(status, ids);
         if(i > 0) {
@@ -142,6 +157,7 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvictBatch(value = "dishCache",keys = "#ids")
     public Result<String> deleteBatches(List<Long> ids) {
         log.info(ids.toString());
         for(Long id:ids) {
@@ -165,6 +181,8 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     }
 
     @Override
+    @MyLog
+    @Cacheable(value = "dishCache",key = "#categoryId",condition = "#categoryId != null")
     public Result<List<DishDto>> listDish(Long categoryId) {
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Dish::getCategoryId,categoryId);

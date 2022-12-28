@@ -14,6 +14,8 @@ import com.itheima.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,6 +41,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     private ShoppingCartService shoppingCartService;
 
     @Override
+    @Cacheable(value = "orderCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<OrdersDto>> selectByPage(int page, int pageSize, String number, LocalDateTime inTime, LocalDateTime endTime) {
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(number != null,Orders::getNumber,number);
@@ -84,6 +87,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     }
 
     @Override
+    @Cacheable(value = "orderCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<OrdersDto>> getOrdersInfo(int page, int pageSize) {
         Page<Orders> ordersPage = new Page<>(page,pageSize);
         LambdaQueryWrapper<Orders> queryWrapper = new LambdaQueryWrapper<>();
@@ -107,6 +111,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
     }
 
     @Override
+    @CachePut(value = "orderCache",key = "#orders.id",condition = "#orders != null")
     public Result<String> submitOrder(Orders orders) {
         log.info("orders:{}",orders.toString());
         Long currentId = BaseContext.getCurrentId();

@@ -7,19 +7,18 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
+import javax.annotation.Resource;
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 @Component
 @Aspect
 public class CacheEvictBatchAspect {
-    @Autowired
+    @Resource
     private CacheManager cacheManager;
-
     @Pointcut("@annotation(com.itheima.annotation.CacheEvictBatch)")
     public void cacheEvictBatch(){
     }

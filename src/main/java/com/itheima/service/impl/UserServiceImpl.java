@@ -2,6 +2,7 @@ package com.itheima.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.Result;
 import com.itheima.domain.User;
 import com.itheima.mapper.UserMapper;
@@ -36,6 +37,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RedisTemplate redisTemplate;
     @Override
+    @MyLog
     public Result<String> sendMessage(User user, HttpSession httpSession) {
         String phone = user.getPhone();
         log.info("phone:{}",phone);
@@ -60,6 +62,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @MyLog
     public Result<User> login(Map map, HttpSession httpSession) {
         String phone = (String) map.get("phone");
         String code = (String) map.get("code");
@@ -83,6 +86,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
+    @MyLog
     public Result<String> logout(HttpSession httpSession) {
         httpSession.removeAttribute("user");
         return Result.success("退出成功");

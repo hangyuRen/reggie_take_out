@@ -1,9 +1,8 @@
 package com.itheima;
 
+import com.itheima.annotation.MyLog;
 import com.itheima.domain.Dish;
 import com.itheima.mapper.DishMapper;
-import com.itheima.service.DishService;
-import com.itheima.service.impl.DishServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -37,5 +36,15 @@ class ReggieApplicationTests {
     void testLogicDeleted() {
         Dish dish = dishMapper.selectById(new BigDecimal("1413385247889891330"));
         System.out.println(dish);
+    }
+
+    @MyLog
+    void testMyLog(int i) {
+        System.out.println(i);
+    }
+
+    @Test
+    void testMyLg2() {
+        testMyLog(5);
     }
 }

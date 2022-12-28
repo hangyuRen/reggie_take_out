@@ -55,7 +55,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/{id}")
-    public Result<DishDto> get(@PathVariable Long id) {
+    public Result<DishDto> get(@PathVariable("id") Long id) {
         return dishService.getByIdWithFlavor(id);
     }
 
@@ -86,7 +86,7 @@ public class DishController {
      * @return
      */
     @PostMapping("/status/{status}")
-    public Result<String> changeStatusForBatch(@PathVariable int status, @RequestParam List<Long> ids) {
+    public Result<String> changeStatusForBatch(@PathVariable("status") int status, @RequestParam List<Long> ids) {
         return dishService.changeStatusForBatch(status,ids);
     }
 

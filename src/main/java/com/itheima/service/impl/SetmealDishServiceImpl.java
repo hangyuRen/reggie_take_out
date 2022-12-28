@@ -1,8 +1,11 @@
 package com.itheima.service.impl;
 
+import ch.qos.logback.core.boolex.EvaluationException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.CacheEvictBatch;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.Result;
 import com.itheima.domain.Category;
 import com.itheima.domain.Setmeal;
@@ -15,6 +18,8 @@ import com.itheima.service.SetmealDishService;
 import com.itheima.service.SetmealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +38,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @MyLog
     public Result<String> saveSetmeal(SetmealDto setmealDto) {
         boolean bool = setmealService.save(setmealDto);
         if(!bool) {
@@ -53,6 +59,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
     }
 
     @Override
+    @Cacheable(value = "setMealDishCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<SetmealDto>> selectByPage(int page,int pageSize,String name) {
         Page<SetmealDto> ipage = new Page<>();
         if(name != null) {
@@ -79,6 +86,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
     }
 
     @Override
+    @Cacheable(value = "setMealDishCache",key = "#id",condition = "#id != null")
     public Result<SetmealDto> getByIdWithDishes(Long id) {
         Setmeal setmeal = setmealService.selectById(id);
         Category category = categoryService.getById(setmeal.getCategoryId());
@@ -95,6 +103,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
     }
 
     @Override
+    @CacheEvictBatch(value = "setMealDishCache",keys = "#ids")
     public Result<String> modifyStatusForSingleOrBatch(int status, List<Long> ids) {
         int i = setmealService.modifyStatusForSingleOrBatch(status,ids);
         if(i <= 0) {
@@ -105,6 +114,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvict(value = "setMealDishCache",key = "#setmealDto.id",condition = "#setmealDto.id != null")
     public Result<String> updateSetmeal(SetmealDto setmealDto) {
         Long setmealId = setmealDto.getId();
         boolean b = setmealService.updateById(setmealDto);
@@ -134,6 +144,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @CacheEvictBatch(value = "setMealDishCache",keys = "#ids")
     public Result<String> deleteSingleOrBatch(List<Long> ids) {
         for(Long id:ids) {
             int statusById = setmealService.getStatusById(id);
@@ -154,6 +165,7 @@ public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, Setme
     }
 
     @Override
+    @Cacheable(value = "setMealDishCache",key = "T(String).valueOf(#categoryId).concat('-').concat(#status)")
     public Result<List<Setmeal>> setmealList(Long categoryId, Integer status) {
         LambdaQueryWrapper<Setmeal> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(categoryId != null,Setmeal::getCategoryId,categoryId);
