@@ -2,16 +2,15 @@ package com.itheima.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.BaseContext;
 import com.itheima.common.Result;
 import com.itheima.domain.AddressBook;
 import com.itheima.exception.CustomException;
 import com.itheima.mapper.AddressBookMapper;
 import com.itheima.service.AddressBookService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +19,6 @@ import java.util.List;
 
 @SuppressWarnings("all")
 @Service
-@Slf4j
 public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, AddressBook> implements AddressBookService {
     @Autowired
     private AddressBookMapper addressBookMapper;
@@ -38,9 +36,8 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
     }
 
     @Override
-    @CachePut(value = "addressCache",key = "#addressBook.id",condition = "#addressbook != null")
+    @MyLog
     public Result<String> addAddress(AddressBook addressBook) {
-        log.info("address:{}",addressBook.toString());
         addressBook.setUserId(BaseContext.getCurrentId());
         int insert = addressBookMapper.insert(addressBook);
         if(insert <= 0) {
@@ -77,6 +74,7 @@ public class AddressBookServiceImpl extends ServiceImpl<AddressBookMapper, Addre
 
     @Override
     @CacheEvict(value = "addressCache",key = "#addressBook.id",condition = "#addressBook != null")
+    @MyLog
     public Result<String> updateAddress(AddressBook addressBook) {
         int i = addressBookMapper.updateById(addressBook);
         if(i <= 0) {

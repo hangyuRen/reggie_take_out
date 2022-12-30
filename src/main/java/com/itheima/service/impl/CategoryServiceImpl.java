@@ -13,28 +13,25 @@ import com.itheima.mapper.CategoryMapper;
 import com.itheima.mapper.DishMapper;
 import com.itheima.mapper.SetmealMapper;
 import com.itheima.service.CategoryService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-@Slf4j
 public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> implements CategoryService {
-    @Autowired
+    @Resource
     private CategoryMapper categoryMapper;
-    @Autowired
+    @Resource
     private DishMapper dishMapper;
-    @Autowired
+    @Resource
     private SetmealMapper setmealMapper;
 
     @Override
     @MyLog
     public Result<String> add(Category category) {
-        log.info("category{}",category.toString());
         int insert = categoryMapper.insert(category);
 
         if(insert > 0) {
@@ -47,7 +44,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     @Cacheable(value = "categoryCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)",unless = "#result = null")
     public Result<Page<Category>> selectByPage(int page, int pageSize) {
-        log.info("page = {},pageSize = {}",page,pageSize);
         Page<Category> iPage = new Page<>();
         iPage.setTotal(categoryMapper.getTotal());
         List<Category> categories = categoryMapper.selectByPage((page - 1) * pageSize, pageSize);
@@ -58,8 +54,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     @CacheEvict(value = "categoryCache",key = "#id",condition = "#id != null")
     public Result<String> deleteById(Long id) {
-        log.info("delete id = {}",id);
-
         LambdaQueryWrapper<Dish> dishQueryWrapper = new LambdaQueryWrapper<>();
         dishQueryWrapper.eq(Dish::getCategoryId,id);
         int dishCount = dishMapper.selectCount(dishQueryWrapper);
@@ -84,8 +78,6 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
     @Override
     @CacheEvict(value = "categoryCache",key = "#category.id",condition = "category != null")
     public Result<String> updateCategory(Category category) {
-        log.info("category:{}",category.toString());
-
         int i = categoryMapper.updateById(category);
         System.out.println(i);
         if(i > 0) {

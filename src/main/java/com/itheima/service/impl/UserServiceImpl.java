@@ -8,23 +8,21 @@ import com.itheima.domain.User;
 import com.itheima.mapper.UserMapper;
 import com.itheima.service.UserService;
 import com.itheima.utils.ValidateCodeUtils;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@SuppressWarnings("all")
 @Service
-@Slf4j
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-    @Autowired
+    @Resource
     private JavaMailSender javaMailSender;
     @Value("${loginMail.from}")
     private String mailFrom;
@@ -34,18 +32,16 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     private String mailSubject;
     @Value("${loginMail.text}")
     private String text;
-    @Autowired
-    private RedisTemplate redisTemplate;
+    @Resource
+    private RedisTemplate<Object,Object> redisTemplate;
     @Override
     @MyLog
     public Result<String> sendMessage(User user, HttpSession httpSession) {
         String phone = user.getPhone();
-        log.info("phone:{}",phone);
         if(StringUtils.isNotEmpty(phone)) {
             String code = ValidateCodeUtils.generateValidateCode(4).toString();
 
             //发送邮箱代码段
-            log.info("code:{}",code);
             SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
             simpleMailMessage.setFrom(mailFrom);
             simpleMailMessage.setTo(mailTo);
@@ -63,7 +59,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
     @Override
     @MyLog
-    public Result<User> login(Map map, HttpSession httpSession) {
+    public Result<User> login(Map<Object, Object> map, HttpSession httpSession) {
         String phone = (String) map.get("phone");
         String code = (String) map.get("code");
 

@@ -6,11 +6,13 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@TableName(value = "dish_flavor")
 public class DishFlavor implements Serializable {
 
+    @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-    @TableId
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Long dishId;

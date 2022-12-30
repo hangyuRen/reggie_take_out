@@ -15,11 +15,7 @@ import java.util.Arrays;
 @Component
 public class MyLogAspect {
     private static final Logger log = LoggerFactory.getLogger(MyLogAspect.class);
-    @Pointcut("@annotation(com.itheima.annotation.MyLog)")
-    public void pointCut(){
-    }
-
-    @Around("pointCut()")
+    @Around("@annotation(com.itheima.annotation.MyLog)")
     public Object doAround(ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method = signature.getMethod();
@@ -32,7 +28,7 @@ public class MyLogAspect {
         return proceed;
     }
 
-    @AfterThrowing("pointCut()")
+    @AfterThrowing("@annotation(com.itheima.annotation.MyLog)")
     public void doAfterThrowing(JoinPoint joinPoint) {
         MethodSignature signature = (MethodSignature)joinPoint.getSignature();
         Method method = signature.getMethod();

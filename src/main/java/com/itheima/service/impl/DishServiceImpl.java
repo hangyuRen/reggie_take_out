@@ -15,32 +15,30 @@ import com.itheima.mapper.DishMapper;
 import com.itheima.service.CategoryService;
 import com.itheima.service.DishFlavorService;
 import com.itheima.service.DishService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"all"})
 @Service
-@Slf4j
+@SuppressWarnings("all")
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
-    @Autowired
+    @Resource
     private DishMapper dishMapper;
-    @Autowired
+    @Resource
     private DishFlavorService dishFlavorService;
-    @Autowired
+    @Resource
     private CategoryService categoryService;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
     @MyLog
     public Result<String> saveWithFlavor(DishDto dishDto) {
-        log.info(dishDto.toString());
         int insert = dishMapper.insert(dishDto);
         if(!(insert > 0)) {
             return Result.error("添加失敗");
@@ -159,7 +157,6 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
     @Transactional(rollbackFor = Exception.class)
     @CacheEvictBatch(value = "dishCache",keys = "#ids")
     public Result<String> deleteBatches(List<Long> ids) {
-        log.info(ids.toString());
         for(Long id:ids) {
             int statusById = dishMapper.getStatusById(id);
             if(statusById == 1) {

@@ -8,21 +8,19 @@ import com.itheima.common.Result;
 import com.itheima.domain.Employee;
 import com.itheima.mapper.EmployeeMapper;
 import com.itheima.service.EmployeeService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Slf4j
 @Service
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService {
-    @Autowired
+    @Resource
     private EmployeeMapper employeeMapper;
 
     @Override
@@ -69,8 +67,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
         employee.setCreateUser(empId);
         employee.setUpdateUser(empId);*/
 
-        log.info("新增员工:{}",employee);
-
         int insert = employeeMapper.insert(employee);
 
         if(insert > 0) {
@@ -83,8 +79,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Cacheable(value = "employeeCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<Employee>> mybatisPlusSelectByPage(int page, int pageSize, String name) {
 
-        log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
-
         Page<Employee> pages = new Page<>((long) (page - 1) * pageSize,pageSize);
         LambdaQueryWrapper<Employee> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.like(StringUtils.isNotEmpty(name),Employee::getName,name);
@@ -96,8 +90,6 @@ public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> i
     @Override
     @Cacheable(value = "employeeCache",key = "T(String).valueOf(#page).concat('-').concat(#pageSize)")
     public Result<Page<Employee>> selectByPage(int page, int pageSize, String name) {
-
-        log.info("page = {},pageSize = {},name = {}",page,pageSize,name);
 
         if(name != null && name.length() != 0) {
             name += "%";

@@ -6,16 +6,15 @@ import com.itheima.annotation.MyLog;
 import com.itheima.domain.DishFlavor;
 import com.itheima.mapper.DishFlavorMapper;
 import com.itheima.service.DishFlavorService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-@Slf4j
 public class DishFlavorServiceImpl extends ServiceImpl<DishFlavorMapper, DishFlavor> implements DishFlavorService {
-    @Autowired
+    @Resource
     private DishFlavorMapper dishFlavorMapper;
     @Override
     @MyLog

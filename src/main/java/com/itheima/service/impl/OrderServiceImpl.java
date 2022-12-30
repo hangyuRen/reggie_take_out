@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.itheima.annotation.MyLog;
 import com.itheima.common.BaseContext;
 import com.itheima.common.Result;
 import com.itheima.domain.*;
@@ -13,31 +14,29 @@ import com.itheima.mapper.OrderMapper;
 import com.itheima.service.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
-@SuppressWarnings("all")
 @Service
 @Slf4j
 public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implements OrderService {
-    @Autowired
+    @Resource
     private OrderMapper orderMapper;
-    @Autowired
+    @Resource
     private OrderDetailService orderDetailService;
-    @Autowired
+    @Resource
     private UserService userService;
-    @Autowired
+    @Resource
     private AddressBookService addressBookService;
-    @Autowired
+    @Resource
     private ShoppingCartService shoppingCartService;
 
     @Override
@@ -112,8 +111,8 @@ public class OrderServiceImpl extends ServiceImpl<OrderMapper, Orders> implement
 
     @Override
     @CachePut(value = "orderCache",key = "#orders.id",condition = "#orders != null")
+    @MyLog
     public Result<String> submitOrder(Orders orders) {
-        log.info("orders:{}",orders.toString());
         Long currentId = BaseContext.getCurrentId();
 
         List<ShoppingCart> userShoppingCart = shoppingCartService.getUserShoppingCart(currentId);

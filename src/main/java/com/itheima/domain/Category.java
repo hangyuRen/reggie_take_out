@@ -1,16 +1,18 @@
 package com.itheima.domain;
 
-import com.baomidou.mybatisplus.annotation.FieldFill;
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@TableName(value = "category")
 public class Category implements Serializable {
 
+    @TableField(exist = false)
     private static final Long serialVersionUID = 1L;
 
+    @TableId(type = IdType.AUTO)
     private Long id;
 
     private Integer type;

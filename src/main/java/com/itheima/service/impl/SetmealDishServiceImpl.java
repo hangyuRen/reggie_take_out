@@ -1,6 +1,5 @@
 package com.itheima.service.impl;
 
-import ch.qos.logback.core.boolex.EvaluationException;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -17,23 +16,23 @@ import com.itheima.service.CategoryService;
 import com.itheima.service.SetmealDishService;
 import com.itheima.service.SetmealService;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @SuppressWarnings("all")
 public class SetmealDishServiceImpl extends ServiceImpl<SetmealDishMapper, SetmealDish> implements SetmealDishService {
-    @Autowired
+    @Resource
     private SetmealService setmealService;
-    @Autowired
+    @Resource
     private SetmealDishMapper setmealDishMapper;
-    @Autowired
+    @Resource
     private CategoryService categoryService;
 
     @Override

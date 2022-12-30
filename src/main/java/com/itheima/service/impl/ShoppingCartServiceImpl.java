@@ -10,17 +10,16 @@ import com.itheima.exception.CustomException;
 import com.itheima.mapper.ShoppingCartMapper;
 import com.itheima.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.List;
 
-@SuppressWarnings("all")
 @Service
 @Slf4j
 public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, ShoppingCart> implements ShoppingCartService {
-    @Autowired
+    @Resource
     private ShoppingCartMapper shoppingCartMapper;
 
     @Override
@@ -69,8 +68,8 @@ public class ShoppingCartServiceImpl extends ServiceImpl<ShoppingCartMapper, Sho
 
     @Override
     @Transactional(rollbackFor = Exception.class)
+    @MyLog
     public Result<String> sub(ShoppingCart shoppingCart) {
-        log.info("dishId:{},setmealId:{}",shoppingCart.getDishId(),shoppingCart.getSetmealId());
         Long dishId = shoppingCart.getDishId();
         LambdaQueryWrapper<ShoppingCart> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ShoppingCart::getUserId,BaseContext.getCurrentId());

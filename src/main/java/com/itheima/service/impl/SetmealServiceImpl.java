@@ -5,18 +5,15 @@ import com.itheima.annotation.CacheEvictBatch;
 import com.itheima.domain.Setmeal;
 import com.itheima.mapper.SetmealMapper;
 import com.itheima.service.SetmealService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.List;
 
 @Service
-@Slf4j
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
-    @Autowired
+    @Resource
     private SetmealMapper setmealMapper;
 
     @Override
